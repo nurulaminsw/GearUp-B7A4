@@ -1,0 +1,37 @@
+model GearItem {
+  id          String     @id @default(uuid())
+  providerId  String
+  categoryId  String
+
+  title       String
+  brand       String?
+  description String?
+  pricePerDay Decimal
+  deposit     Decimal?   @default(0)
+  status      GearStatus @default(ACTIVE)
+
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  provider   User     @relation("ProviderGear", fields: [providerId], references: [id])
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  inventory  GearInventory?
+  orderItems RentalOrderItem[]
+  reviews    Review[]
+
+  @@index([providerId])
+  @@index([categoryId])
+
+  @@map("gear_items")
+}
+
+model GearInventory {
+  gearId        String  @id
+  totalQuantity Int
+  updatedAt     DateTime @updatedAt
+
+  gear          GearItem @relation(fields: [gearId], references: [id])
+
+  @@map("gear_inventory")
+}
