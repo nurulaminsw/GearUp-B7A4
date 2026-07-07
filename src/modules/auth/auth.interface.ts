@@ -6,3 +6,8 @@ export interface UserPayload {
   password: string;
   role: Role;
 }
+
+export interface IUserLoginPayload {
+  email: string;
+  password: string;
+}
