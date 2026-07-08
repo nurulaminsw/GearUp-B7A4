@@ -1,26 +1,51 @@
 import { Request, Response } from "express";
+import httpStatus from "http-status";
+import { catchAsync } from "../../utils/catchAsync";
+import { sendResponse } from "../../utils/sendResponse";
+import { rentalService } from "./rental.service";
 
-const createRental = async (req: Request, res: Response) => {
-  res.status(200).json({
-    success: true,
-    message: "createRental controller working (not implemented yet)",
-  });
-};
+const createRental = catchAsync(async (req: Request, res: Response) => {
+  const customerId = (req as any).user?.id as string;
 
-const getMyRentals = async (req: Request, res: Response) => {
-  res.status(200).json({
-    success: true,
-    message: "getMyRentals controller working (not implemented yet)",
-  });
-};
+  const result = await rentalService.createRentalIntoDB(customerId, req.body);
 
-const getRentalDetails = async (req: Request, res: Response) => {
-  res.status(200).json({
+  sendResponse(res, {
     success: true,
-    message: "getRentalDetails controller working (not implemented yet)",
-    id: req.params.id,
+    statusCode: httpStatus.CREATED,
+    message: "Rental order created successfully",
+    data: result,
   });
-};
+});
+
+const getMyRentals = catchAsync(async (req: Request, res: Response) => {
+  const customerId = (req as any).user?.id as string;
+
+  const result = await rentalService.getMyRentalsFromDB(customerId);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Rental orders retrieved successfully",
+    data: result,
+  });
+});
+
+const getRentalDetails = catchAsync(async (req: Request, res: Response) => {
+  const customerId = (req as any).user?.id as string;
+  const { id } = req.params;
+
+  const result = await rentalService.getRentalDetailsFromDB(
+    customerId,
+    id as string,
+  );
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Rental order details retrieved successfully",
+    data: result,
+  });
+});
 
 export const rentalController = {
   createRental,
