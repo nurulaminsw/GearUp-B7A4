@@ -22,6 +22,20 @@ const getAllGear = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getGearDetails = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  const result = await publicGearService.getGearDetailsFromDB(id as string);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Gear details retrieved successfully",
+    data: result,
+  });
+});
+
 export const publicGearController = {
   getAllGear,
+  getGearDetails
 };
