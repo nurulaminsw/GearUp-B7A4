@@ -4,6 +4,8 @@ import express, { Application, Request, Response } from "express";
 import config from "./config";
 import { authRouter } from "./modules/auth/auth.route";
 import { categoryRoute } from "./modules/category/category.route";
+import { providerGearRoute } from "./modules/gear/gear.route";
+import { publicGearRoute } from "./modules/gear/publicGear.route";
 
 const app: Application = express();
 app.use(express.json());
@@ -22,5 +24,9 @@ app.get("/", (req: Request, res: Response) => {
 
 app.use("/api/auth", authRouter);
 app.use("/api/categories", categoryRoute);
+app.use("/api/provider/gear", providerGearRoute);
+app.use("/api/gear", publicGearRoute);
+
+
 
 export default app;
