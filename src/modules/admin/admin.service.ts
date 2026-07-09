@@ -40,8 +40,35 @@ const updateUserStatusInDB = async (userId: string, status: "ACTIVE" | "SUSPENDE
 
   return updated;
 };
+const getAllGearForAdminFromDB = async () => {
+  const gear = await prisma.gearItem.findMany({
+    orderBy: { createdAt: "desc" },
+    include: {
+      category: true,
+      inventory: true,
+      provider: { select: { id: true, name: true, email: true } },
+    },
+  });
 
+  return gear;
+};
+const getAllRentalsForAdminFromDB = async () => {
+  const rentals = await prisma.rentalOrder.findMany({
+    orderBy: { createdAt: "desc" },
+    include: {
+      customer: { select: { id: true, name: true, email: true } },
+      provider: { select: { id: true, name: true, email: true } },
+      items: { include: { gear: true } },
+      payments: true,
+      review: true,
+    },
+  });
+
+  return rentals;
+};
 export const adminService = {
   getAllUsersFromDB,
-  updateUserStatusInDB
+  updateUserStatusInDB,
+  getAllGearForAdminFromDB,
+  getAllRentalsForAdminFromDB,
 };

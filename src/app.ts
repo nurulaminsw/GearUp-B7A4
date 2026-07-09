@@ -2,6 +2,9 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import express, { Application, Request, Response } from "express";
 import config from "./config";
+import { globalErrorHandler } from "./middlewares/globalErrorHandler";
+import { notFound } from "./middlewares/notFound";
+import { adminRoute } from "./modules/admin/admin.route";
 import { authRouter } from "./modules/auth/auth.route";
 import { categoryRoute } from "./modules/category/category.route";
 import { providerGearRoute } from "./modules/gear/gear.route";
@@ -10,7 +13,6 @@ import { paymentRoute } from "./modules/payments/payment.route";
 import { providerOrderRoute } from "./modules/providerOrders/providerOrder.route";
 import { rentalRoute } from "./modules/rentals/rental.route";
 import { reviewRoute } from "./modules/reviews/review.route";
-import { adminRoute } from "./modules/admin/admin.route";
 
 const app: Application = express();
 app.use(express.json());
@@ -37,5 +39,7 @@ app.use("/api/payments", paymentRoute);
 app.use("/api/reviews", reviewRoute);
 app.use("/api/admin", adminRoute);
 
+app.use(notFound);
+app.use(globalErrorHandler);
 
 export default app;
