@@ -46,9 +46,22 @@ const getRentalDetails = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+const cancelRental = catchAsync(async (req:Request, res: Response) => {
+  const customerId = (req as any).user?.id as string;
+  const id = req.params.id as string;
 
+  const result = await rentalService.cancelRentalFromDB(customerId, id);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Rental order cancelled successfully",
+    data: result,
+  });
+});
 export const rentalController = {
   createRental,
   getMyRentals,
   getRentalDetails,
+  cancelRental,
 };

@@ -16,5 +16,7 @@ router.post(
 
 router.get("/", auth(Role.CUSTOMER), rentalController.getMyRentals);
 router.get("/:id", auth(Role.CUSTOMER), rentalController.getRentalDetails);
+router.patch("/:id/cancel", auth(Role.CUSTOMER), rentalController.cancelRental);
+
 
 export const rentalRoute = router;

@@ -9,6 +9,7 @@ import { publicGearRoute } from "./modules/gear/publicGear.route";
 import { paymentRoute } from "./modules/payments/payment.route";
 import { providerOrderRoute } from "./modules/providerOrders/providerOrder.route";
 import { rentalRoute } from "./modules/rentals/rental.route";
+import { reviewRoute } from "./modules/reviews/review.route";
 
 const app: Application = express();
 app.use(express.json());
@@ -32,5 +33,7 @@ app.use("/api/provider/orders", providerOrderRoute);
 app.use("/api/gear", publicGearRoute);
 app.use("/api/rentals", rentalRoute);
 app.use("/api/payments", paymentRoute);
+app.use("/api/reviews", reviewRoute);
+
 
 export default app;

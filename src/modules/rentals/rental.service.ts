@@ -7,10 +7,7 @@ type CreateRentalBody = {
   items: { gearId: string; quantity: number }[];
 };
 
-const createRentalIntoDB = async (
-  customerId: string,
-  body: CreateRentalBody,
-) => {
+const createRentalIntoDB = async (customerId: string, body: CreateRentalBody) => {
   const sDate = new Date(body.startDate);
   const eDate = new Date(body.endDate);
 
@@ -32,12 +29,15 @@ const createRentalIntoDB = async (
     err.statusCode = httpStatus.BAD_REQUEST;
     throw err;
   }
+
   if (gears.length === 0) {
     const err: any = new Error("No gear found");
     err.statusCode = httpStatus.BAD_REQUEST;
     throw err;
   }
+
   const providerId = gears[0]!.providerId;
+
   if (!gears.every((g) => g.providerId === providerId)) {
     const err: any = new Error("All items must be from the same provider");
     err.statusCode = httpStatus.BAD_REQUEST;
@@ -83,6 +83,8 @@ const createRentalIntoDB = async (
       },
       include: {
         items: { include: { gear: true } },
+        payments: true,
+        review: true,
       },
     });
 
@@ -125,8 +127,40 @@ const getRentalDetailsFromDB = async (customerId: string, orderId: string) => {
   return order;
 };
 
+const cancelRentalFromDB = async (customerId: string, orderId: string) => {
+  const order = await prisma.rentalOrder.findFirst({
+    where: { id: orderId, customerId },
+    select: { id: true, status: true },
+  });
+
+  if (!order) {
+    const err: any = new Error("Rental order not found");
+    err.statusCode = httpStatus.NOT_FOUND;
+    throw err;
+  }
+
+  if (order.status !== "PLACED") {
+    const err: any = new Error("Only PLACED orders can be cancelled");
+    err.statusCode = httpStatus.BAD_REQUEST;
+    throw err;
+  }
+
+  const updated = await prisma.rentalOrder.update({
+    where: { id: orderId },
+    data: { status: "CANCELLED" },
+    include: {
+      items: { include: { gear: true } },
+      payments: true,
+      review: true,
+    },
+  });
+
+  return updated;
+};
+
 export const rentalService = {
   createRentalIntoDB,
   getMyRentalsFromDB,
   getRentalDetailsFromDB,
+  cancelRentalFromDB,
 };
