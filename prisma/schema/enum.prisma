@@ -33,3 +33,9 @@ enum PaymentStatus {
   COMPLETED
   FAILED
 }
+
+enum RefundStatus {
+  NONE
+  PENDING
+  REFUNDED
+}

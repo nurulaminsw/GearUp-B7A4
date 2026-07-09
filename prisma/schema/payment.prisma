@@ -3,19 +3,18 @@ model Payment {
   rentalOrderId String
   customerId    String
 
-  provider      PaymentProvider @default(STRIPE)
-  sessionId     String          @unique
-  amount        Decimal
-  status        PaymentStatus   @default(PENDING)
-  paidAt        DateTime?
+  provider  PaymentProvider @default(STRIPE)
+  sessionId String          @unique
+  amount    Decimal
+  status    PaymentStatus   @default(PENDING)
+  paidAt    DateTime?
 
-  createdAt     DateTime @default(now())
+  createdAt DateTime @default(now())
 
   rentalOrder RentalOrder @relation(fields: [rentalOrderId], references: [id])
   customer    User        @relation(fields: [customerId], references: [id])
 
   @@index([rentalOrderId])
   @@index([customerId])
-
   @@map("payments")
 }

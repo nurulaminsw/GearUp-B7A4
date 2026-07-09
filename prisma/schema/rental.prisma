@@ -1,18 +1,21 @@
 model RentalOrder {
-  id          String      @id @default(uuid())
-  customerId  String
-  providerId  String
+  id         String @id @default(uuid())
+  customerId String
+  providerId String
 
-  startDate   DateTime
-  endDate     DateTime
-  status      OrderStatus @default(PLACED)
+  startDate DateTime
+  endDate   DateTime
+  status    OrderStatus @default(PLACED)
 
   subtotal    Decimal
-  deposit     Decimal     @default(0)
+  deposit     Decimal @default(0)
   totalAmount Decimal
 
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  refundStatus   RefundStatus @default(NONE)
+  refundedAmount Decimal      @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   customer User @relation("CustomerOrders", fields: [customerId], references: [id])
   provider User @relation("ProviderOrders", fields: [providerId], references: [id])
@@ -23,14 +26,13 @@ model RentalOrder {
 
   @@index([customerId])
   @@index([providerId])
-
   @@map("rental_orders")
 }
 
 model RentalOrderItem {
-  id              String @id @default(uuid())
-  rentalOrderId   String
-  gearId          String
+  id            String @id @default(uuid())
+  rentalOrderId String
+  gearId        String
 
   quantity        Int
   pricePerDaySnap Decimal
@@ -41,6 +43,5 @@ model RentalOrderItem {
 
   @@index([rentalOrderId])
   @@index([gearId])
-
   @@map("rental_order_items")
 }

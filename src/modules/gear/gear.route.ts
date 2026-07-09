@@ -1,9 +1,9 @@
 import { Router } from "express";
-import { gearController } from "./gear.controller";
+import { Role } from "../../../generated/prisma/client";
 import { auth } from "../../middlewares/auth";
 import { validateRequest } from "../../middlewares/validateRequest";
-import { createGearZodSchema } from "./gear.validation";
-import { Role } from "../../../generated/prisma/client";
+import { gearController } from "./gear.controller";
+import { createGearZodSchema, updateGearZodSchema } from "./gear.validation";
 
 const router = Router();
 
@@ -13,5 +13,14 @@ router.post(
   validateRequest(createGearZodSchema),
   gearController.createGear,
 );
+
+router.put(
+  "/:id",
+  auth(Role.PROVIDER),
+  validateRequest(updateGearZodSchema),
+  gearController.updateGear,
+);
+
+router.delete("/:id", auth(Role.PROVIDER), gearController.deleteGear);
 
 export const providerGearRoute = router;

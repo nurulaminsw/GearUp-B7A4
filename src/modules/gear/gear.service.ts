@@ -1,4 +1,7 @@
 import { prisma } from "../../lib/prisma";
+import { UpdateGearPayload } from "./gear.interface";
+import httpStatus from "http-status";
+
 
 type CreateGearPayload = {
   providerId: string;
@@ -50,6 +53,89 @@ const createGearIntoDB = async (payload: CreateGearPayload) => {
   return result;
 };
 
+const updateGearInDB = async (
+  providerId: string,
+  gearId: string,
+  payload: UpdateGearPayload,
+) => {
+  const gear = await prisma.gearItem.findFirst({
+    where: { id: gearId, providerId },
+    select: { id: true },
+  });
+
+  if (!gear) {
+    const err: any = new Error("Gear not found");
+    err.statusCode = httpStatus.NOT_FOUND;
+    throw err;
+  }
+
+  const {
+    totalQuantity,
+    categoryId,
+    title,
+    brand,
+    description,
+    pricePerDay,
+    deposit,
+    status,
+  } = payload;
+
+  const updated = await prisma.gearItem.update({
+    where: { id: gearId },
+    data: {
+      categoryId,
+      title,
+      brand,
+      description,
+      pricePerDay,
+      deposit,
+      status,
+      inventory:
+        totalQuantity !== undefined
+          ? {
+              upsert: {
+                create: { totalQuantity },
+                update: { totalQuantity },
+              },
+            }
+          : undefined,
+    },
+    include: {
+      inventory: true,
+      category: true,
+    },
+  });
+
+  return updated;
+};
+
+const deleteGearFromDB = async (providerId: string, gearId: string) => {
+  const gear = await prisma.gearItem.findFirst({
+    where: { id: gearId, providerId },
+    select: { id: true },
+  });
+
+  if (!gear) {
+    const err: any = new Error("Gear not found");
+    err.statusCode = httpStatus.NOT_FOUND;
+    throw err;
+  }
+
+  await prisma.$transaction(async (tx) => {
+    await tx.gearInventory.deleteMany({
+      where: { gearId },
+    });
+
+    await tx.gearItem.delete({
+      where: { id: gearId },
+    });
+  });
+
+  return { id: gearId };
+};
+
 export const gearService = {
   createGearIntoDB,
+  updateGearInDB,
+  deleteGearFromDB,
 };

@@ -5,7 +5,7 @@ import { sendResponse } from "../../utils/sendResponse";
 import { rentalService } from "./rental.service";
 
 const createRental = catchAsync(async (req: Request, res: Response) => {
-  const customerId = (req as any).user?.id as string;
+  const customerId = req.user?.id as string;
 
   const result = await rentalService.createRentalIntoDB(customerId, req.body);
 
