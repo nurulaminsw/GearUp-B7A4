@@ -1,7 +1,6 @@
+import httpStatus from "http-status";
 import { prisma } from "../../lib/prisma";
 import { UpdateGearPayload } from "./gear.interface";
-import httpStatus from "http-status";
-
 
 type CreateGearPayload = {
   providerId: string;
@@ -121,17 +120,22 @@ const deleteGearFromDB = async (providerId: string, gearId: string) => {
     throw err;
   }
 
-  await prisma.$transaction(async (tx) => {
-    await tx.gearInventory.deleteMany({
+  const updated = await prisma.$transaction(async (tx) => {
+    await tx.gearInventory.updateMany({
       where: { gearId },
+      data: { totalQuantity: 0 },
     });
 
-    await tx.gearItem.delete({
+    const g = await tx.gearItem.update({
       where: { id: gearId },
+      data: { status: "INACTIVE" },
+      include: { inventory: true, category: true },
     });
+
+    return g;
   });
 
-  return { id: gearId };
+  return updated;
 };
 
 export const gearService = {
