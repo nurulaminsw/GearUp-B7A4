@@ -90,7 +90,26 @@ const updateMyReviewInDB = async (
   return updated;
 };
 
+const deleteMyReviewFromDB = async (customerId: string, reviewId: string) => {
+  const review = await prisma.review.findFirst({
+    where: { id: reviewId, customerId },
+    select: { id: true },
+  });
+
+  if (!review) {
+    const err: any = new Error("Review not found");
+    err.statusCode = httpStatus.NOT_FOUND;
+    throw err;
+  }
+
+  await prisma.review.delete({ where: { id: reviewId } });
+  return { id: reviewId };
+};
+
+
 export const reviewService = {
   createReviewIntoDB,
   updateMyReviewInDB,
+  deleteMyReviewFromDB
+  
 };
