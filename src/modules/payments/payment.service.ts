@@ -35,11 +35,17 @@ const createPaymentSessionFromDB = async (
     throw err;
   }
 
+  const user = await prisma.user.findUniqueOrThrow({
+    where: { id: customerId },
+    select: { email: true },
+  });
+
   const amount = Number(order.totalAmount);
   const unitAmount = Math.round(amount * 100);
 
   const session = await stripe.checkout.sessions.create({
     mode: "payment",
+    customer_email: user.email,
     payment_method_types: ["card"],
     line_items: [
       {
