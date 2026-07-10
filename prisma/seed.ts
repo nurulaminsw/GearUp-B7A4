@@ -1,8 +1,7 @@
 import bcrypt from "bcryptjs";
 import { prisma } from "../src/lib/prisma";
 
-// Role enum তোমার যেই জায়গা থেকে আসে সেটাই use করো
-import { Role } from "../generated/prisma/client"; // যদি @prisma/client use করো: import { Role } from "@prisma/client";
+import { Role } from "../generated/prisma/client";
 
 async function main() {
   const passwordHash = await bcrypt.hash("123456", 10);
@@ -108,7 +107,7 @@ async function main() {
         title: g.title,
         brand: g.brand,
         description: g.description,
-        pricePerDay: g.pricePerDay as any, // Decimal হলে prisma accept করে (বা string)
+        pricePerDay: g.pricePerDay as any,
         deposit: g.deposit as any,
         inventory: {
           create: { totalQuantity: g.totalQuantity },

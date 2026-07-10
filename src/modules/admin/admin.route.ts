@@ -1,9 +1,11 @@
 import { Router } from "express";
-import { Role } from "../../../generated/prisma/client";
+
 import { auth } from "../../middlewares/auth";
 import { validateRequest } from "../../middlewares/validateRequest";
 import { adminController } from "./admin.controller";
 import { updateUserStatusZodSchema } from "./admin.validation";
+import { Role } from "../../../generated/prisma/client";
+
 
 const router = Router();
 
