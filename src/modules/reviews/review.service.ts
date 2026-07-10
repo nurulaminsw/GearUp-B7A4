@@ -62,6 +62,35 @@ const createReviewIntoDB = async (payload: CreateReviewPayload) => {
   return review;
 };
 
+const updateMyReviewInDB = async (
+  customerId: string,
+  reviewId: string,
+  payload: { rating?: number; comment?: string },
+) => {
+  const review = await prisma.review.findFirst({
+    where: { id: reviewId, customerId },
+    select: { id: true },
+  });
+
+  if (!review) {
+    const err: any = new Error("Review not found");
+    err.statusCode = httpStatus.NOT_FOUND;
+    throw err;
+  }
+
+  const updated = await prisma.review.update({
+    where: { id: reviewId },
+    data: payload,
+    include: {
+      customer: { select: { id: true, name: true } },
+      gear: { select: { id: true, title: true } },
+    },
+  });
+
+  return updated;
+};
+
 export const reviewService = {
   createReviewIntoDB,
+  updateMyReviewInDB,
 };
