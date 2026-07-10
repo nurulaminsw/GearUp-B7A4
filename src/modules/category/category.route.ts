@@ -2,10 +2,10 @@ import { Router } from "express";
 
 import { auth } from "../../middlewares/auth";
 
-import { categoryController } from "./category.controller";
-import { createCategoryZodSchema } from "./category.validation";
 import { Role } from "../../../generated/prisma/enums";
 import { validateRequest } from "../../middlewares/validateRequest";
+import { categoryController } from "./category.controller";
+import { createCategoryZodSchema } from "./category.validation";
 
 const router = Router();
 
@@ -16,6 +16,12 @@ router.post(
   auth(Role.ADMIN),
   validateRequest(createCategoryZodSchema),
   categoryController.createCategory,
+);
+router.put(
+  "/:id",
+  auth(Role.ADMIN),
+  validateRequest(updateCategoryZodSchema),
+  categoryController.updateCategory,
 );
 
 export const categoryRoute = router;
