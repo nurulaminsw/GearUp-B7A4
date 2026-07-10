@@ -5,7 +5,10 @@ import { auth } from "../../middlewares/auth";
 import { Role } from "../../../generated/prisma/enums";
 import { validateRequest } from "../../middlewares/validateRequest";
 import { categoryController } from "./category.controller";
-import { createCategoryZodSchema } from "./category.validation";
+import {
+  createCategoryZodSchema,
+  updateCategoryZodSchema,
+} from "./category.validation";
 
 const router = Router();
 
@@ -23,5 +26,7 @@ router.put(
   validateRequest(updateCategoryZodSchema),
   categoryController.updateCategory,
 );
+
+router.delete("/:id", auth(Role.ADMIN), categoryController.deleteCategory);
 
 export const categoryRoute = router;
