@@ -71,152 +71,278 @@ BCRYPT_SALT_ROUNDS=10
 STRIPE_SECRET_KEY=sk_test_xxx
 CLIENT_URL=https://gearup-b7a4.onrender.com
 
-# Webhook (optional)
+## Webhook (Optional)
 
-STRIPE_WEBHOOK_SECRET=whsec_xxx 3) Prisma (Migrate + Generate)
-Bash
+```env
+STRIPE_WEBHOOK_SECRET=whsec_xxx
+```
 
+---
+
+## Prisma: Migrate & Generate
+
+```bash
 npx prisma migrate dev
-npx prisma generate 4) Seed Database
-Bash
+npx prisma generate
+```
 
+---
+
+## Seed Database
+
+```bash
 npm run seed
-Seed Credentials
+```
 
-txt
+### Seed Credentials
 
-Admin: admin@gearup.com / 123456
-Provider: provider@gearup.com / 123456
-Customer: customer@gearup.com / 123456 5) Run Server
-Bash
+```txt
+Admin:
+Email: admin@gearup.com
+Password: 123456
 
+Provider:
+Email: provider@gearup.com
+Password: 123456
+
+Customer:
+Email: customer@gearup.com
+Password: 123456
+```
+
+---
+
+## Run Server
+
+```bash
 npm run dev
-Base URL:
+```
 
-txt
+### Base URL
 
+```txt
 https://gearup-b7a4.onrender.com
-Authentication Notes
-Authentication is cookie-based
-Login sets httpOnly cookies:
-accessToken
-refreshToken
-Protected routes require the cookie to be present (Postman cookies must be enabled)
-API Documentation (Postman)
-Postman Collection
-Exported Postman collection is included:
+```
 
-txt
+---
 
+# Authentication Notes
+
+- Authentication is cookie-based.
+- Login sets the following `httpOnly` cookies:
+  - `accessToken`
+  - `refreshToken`
+- Protected routes require authentication cookies.
+- When using Postman, make sure cookies are enabled.
+
+---
+
+# API Documentation (Postman)
+
+## Postman Collection
+
+The exported Postman collection is available here:
+
+```txt
 ./postman/GearUp.postman_collection.json
-How to use
-Postman → Import → select the JSON file
-Create an environment variable:
-txt
+```
 
+### How to Use
+
+1. Open Postman.
+2. Click **Import**.
+3. Select the file:
+
+```txt
+./postman/GearUp.postman_collection.json
+```
+
+4. Create an environment variable:
+
+```txt
 baseUrl = https://gearup-b7a4.onrender.com
-Use URLs like:
-txt
+```
 
+### Example URLs
+
+```txt
 {{baseUrl}}/api/gear
 {{baseUrl}}/api/categories
 {{baseUrl}}/api/rentals
 {{baseUrl}}/api/payments
-API Endpoints
-Base URL: {{baseUrl}}
+```
 
-Authentication
-Method Endpoint Description
-POST /api/auth/register Register new user (customer/provider)
-POST /api/auth/login Login user (sets cookies)
-POST /api/auth/refresh-token Refresh access token (cookie-based)
-GET /api/auth/me Get current authenticated user
-Categories
-Method Endpoint Description
-GET /api/categories Get all categories (public)
-POST /api/categories Create category (admin only)
-PUT /api/categories/:id Update category (admin only) (optional)
-DELETE /api/categories/:id Delete category (admin only, blocked if gear exists) (optional)
-Gear (Public)
-Method Endpoint Description
-GET /api/gear Get all gear with filters
-GET /api/gear/:id Get gear details (ACTIVE only)
-Gear Filters (Query Params)
+---
 
-txt
+# API Endpoints
 
+**Base URL:**
+
+```txt
+{{baseUrl}}
+```
+
+---
+
+## Authentication
+
+| Method | Endpoint                  | Description                               |
+| ------ | ------------------------- | ----------------------------------------- |
+| POST   | `/api/auth/register`      | Register a new customer or provider       |
+| POST   | `/api/auth/login`         | Login user and set authentication cookies |
+| POST   | `/api/auth/refresh-token` | Refresh access token using cookie         |
+| GET    | `/api/auth/me`            | Get current authenticated user            |
+
+---
+
+## Categories
+
+| Method | Endpoint              | Description                                            |
+| ------ | --------------------- | ------------------------------------------------------ |
+| GET    | `/api/categories`     | Get all categories (public)                            |
+| POST   | `/api/categories`     | Create a category (admin only)                         |
+| PUT    | `/api/categories/:id` | Update a category (admin only)                         |
+| DELETE | `/api/categories/:id` | Delete a category (admin only, blocked if gear exists) |
+
+---
+
+## Gear (Public)
+
+| Method | Endpoint        | Description                         |
+| ------ | --------------- | ----------------------------------- |
+| GET    | `/api/gear`     | Get all active gear with filters    |
+| GET    | `/api/gear/:id` | Get gear details (active gear only) |
+
+### Gear Filters (Query Params)
+
+```txt
 /api/gear?categoryId=<id>
 /api/gear?brand=intex
 /api/gear?minPrice=100&maxPrice=1000
 /api/gear?categoryId=<id>&brand=nike&minPrice=100
-Provider Gear Management
-Method Endpoint Description
-POST /api/provider/gear Add gear to inventory
-PUT /api/provider/gear/:id Update gear listing
-DELETE /api/provider/gear/:id Remove gear from inventory (soft remove)
-Soft Remove Behavior
+```
 
-Sets gear.status = INACTIVE
-Sets inventory.totalQuantity = 0
-Prevents FK errors and preserves rental history
-Rental Orders (Customer)
-Method Endpoint Description
-POST /api/rentals Create new rental order (status: PLACED)
-GET /api/rentals Get user's rental orders
-GET /api/rentals/:id Get rental order details
-PATCH /api/rentals/:id/cancel Cancel order (PLACED only)
-Provider Orders
-Method Endpoint Description
-GET /api/provider/orders Get provider's incoming orders
-PATCH /api/provider/orders/:id Update rental order status
-Allowed Status Transitions
+---
 
-txt
+## Provider Gear Management
 
-PLACED -> CONFIRMED (provider)
-CONFIRMED -> PAID (payment)
-PAID -> PICKED_UP (provider)
-PICKED_UP -> RETURNED (provider)
-PLACED -> CANCELLED (customer)
-Payments (Stripe)
-Method Endpoint Description
-POST /api/payments/create Create Stripe checkout session (order must be CONFIRMED)
-POST /api/payments/confirm Confirm/verify payment (callback)
-GET /api/payments Get user's payment history
-GET /api/payments/:id Get payment details
-POST /api/payments/webhook Stripe webhook (optional)
-Reviews
-Method Endpoint Description
-POST /api/reviews Create review (only after RETURNED),
-PATCH /api/reviews/:id Update review (customer only won review)
-DELETE /api/reviews/:id delete review (customer only won review)
+| Method | Endpoint                 | Description                              |
+| ------ | ------------------------ | ---------------------------------------- |
+| POST   | `/api/provider/gear`     | Add gear to provider inventory           |
+| PUT    | `/api/provider/gear/:id` | Update a gear listing                    |
+| DELETE | `/api/provider/gear/:id` | Remove gear from inventory (soft remove) |
 
-Review Rules
+### Soft Remove Behavior
 
-Review allowed only if order status is RETURNED
-One order = one review
-Review gear must belong to the rental order items
-Admin
-Method Endpoint Description
-GET /api/admin/users Get all users
-PATCH /api/admin/users/:id Suspend/activate user
-GET /api/admin/gear Get all gear listings
-GET /api/admin/rentals Get all rental orders
-Stripe Test Card
-txt
+When a provider removes gear:
 
-Card: 4242 4242 4242 4242
-Exp: 12/34
+- `gear.status` is set to `INACTIVE`
+- `inventory.totalQuantity` is set to `0`
+- Rental history is preserved
+- Foreign key errors are prevented
+
+---
+
+## Rental Orders (Customer)
+
+| Method | Endpoint                  | Description                          |
+| ------ | ------------------------- | ------------------------------------ |
+| POST   | `/api/rentals`            | Create a new rental order (`PLACED`) |
+| GET    | `/api/rentals`            | Get current user's rental orders     |
+| GET    | `/api/rentals/:id`        | Get rental order details             |
+| PATCH  | `/api/rentals/:id/cancel` | Cancel rental order (`PLACED` only)  |
+
+---
+
+## Provider Orders
+
+| Method | Endpoint                   | Description                           |
+| ------ | -------------------------- | ------------------------------------- |
+| GET    | `/api/provider/orders`     | Get provider's incoming rental orders |
+| PATCH  | `/api/provider/orders/:id` | Update rental order status            |
+
+### Allowed Status Transitions
+
+```txt
+PLACED -> CONFIRMED   (Provider)
+CONFIRMED -> PAID     (Payment)
+PAID -> PICKED_UP     (Provider)
+PICKED_UP -> RETURNED (Provider)
+PLACED -> CANCELLED   (Customer)
+```
+
+---
+
+## Payments (Stripe)
+
+| Method | Endpoint                | Description                                                |
+| ------ | ----------------------- | ---------------------------------------------------------- |
+| POST   | `/api/payments/create`  | Create Stripe Checkout Session (order must be `CONFIRMED`) |
+| POST   | `/api/payments/confirm` | Confirm or verify payment callback                         |
+| GET    | `/api/payments`         | Get current user's payment history                         |
+| GET    | `/api/payments/:id`     | Get payment details                                        |
+| POST   | `/api/payments/webhook` | Stripe webhook endpoint (optional)                         |
+
+---
+
+## Reviews
+
+| Method | Endpoint           | Description                              |
+| ------ | ------------------ | ---------------------------------------- |
+| POST   | `/api/reviews`     | Create a review after rental is returned |
+| PATCH  | `/api/reviews/:id` | Update own review (customer only)        |
+| DELETE | `/api/reviews/:id` | Delete own review (customer only)        |
+
+### Review Rules
+
+- A review can only be created when the rental status is `RETURNED`.
+- One rental order can have only one review.
+- Reviewed gear must belong to the rental order items.
+- A customer can update or delete only their own review.
+
+---
+
+## Admin
+
+| Method | Endpoint               | Description                |
+| ------ | ---------------------- | -------------------------- |
+| GET    | `/api/admin/users`     | Get all users              |
+| PATCH  | `/api/admin/users/:id` | Suspend or activate a user |
+| GET    | `/api/admin/gear`      | Get all gear listings      |
+| GET    | `/api/admin/rentals`   | Get all rental orders      |
+
+---
+
+# Stripe Test Card
+
+Use the following Stripe test card for payment testing:
+
+```txt
+Card Number: 4242 4242 4242 4242
+Expiry Date: 12/34
 CVC: 123
-Error Handling & Validation
-Input validation via Zod
-Global error handler returns structured responses
-404 handler for unknown routes
-Video Explanation (3–5 min)
-Add your video link here:
+```
 
-txt
+---
 
-<VIDEO_LINK>
-License
-This project is created for assignment/demo purposes.
+# Error Handling & Validation
+
+- Input validation is handled using **Zod**.
+- A global error handler returns structured error responses.
+- A `404` handler is included for unknown routes.
+
+---
+
+# Video Explanation
+
+Add your project video link here:
+
+```txt
+https://drive.google.com/file/d/11dxmW6RUnG0evDzeKYXLiSy56x4pKCJm/view?usp=sharing
+```
+
+---
+
+# License
+
+This project is created for assignment and demo purposes.
