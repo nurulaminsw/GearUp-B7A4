@@ -66,7 +66,7 @@ const getAllRentalsForAdminFromDB = async () => {
 
   return rentals;
 };
-export const adminService = {
+export const  adminService = {
   getAllUsersFromDB,
   updateUserStatusInDB,
   getAllGearForAdminFromDB,

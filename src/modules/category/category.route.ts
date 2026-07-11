@@ -12,14 +12,13 @@ import {
 
 const router = Router();
 
-router.get("/", categoryController.getAllCategories);
-
 router.post(
   "/",
   auth(Role.ADMIN),
   validateRequest(createCategoryZodSchema),
   categoryController.createCategory,
 );
+router.get("/", categoryController.getAllCategories);
 router.put(
   "/:id",
   auth(Role.ADMIN),
